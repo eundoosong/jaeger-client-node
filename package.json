@@ -55,7 +55,8 @@
     "source-map-support": "^0.4.5",
     "tchannel": "^3.9.0",
     "uber-licence": "^2.0.2",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "prom-client": "^11.0.0"
   },
   "scripts": {
     "check-license": "./scripts/check-license.sh",
