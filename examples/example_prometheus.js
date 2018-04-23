@@ -9,7 +9,7 @@ const app = express();
 var config = {
   serviceName: 'my-awesome-service',
   sampler: {
-    type: 'const',
+    type: 'remote',
     param: 1,
   },
 };
@@ -20,13 +20,22 @@ var options = {
     'my-awesome-service.version': '1.1.2',
   },
   metrics: metrics,
+  logger: console,
 };
 
 var tracer = initTracer(config, options);
 
-var span = tracer.startSpan('test');
-span.setTag('key', 'value');
-span.finish();
+var cnt = 1;
+app.get('/log', (req, res) => {
+  var span = tracer.startSpan('test:' + cnt);
+  span.setTag('key', 'value');
+
+  res.end('log');
+
+  span.finish();
+  tracer._reporter.flush();
+  cnt = cnt + 1;
+});
 
 app.get('/metrics', (req, res) => {
   res.set('Content-Type', metrics.register().contentType);

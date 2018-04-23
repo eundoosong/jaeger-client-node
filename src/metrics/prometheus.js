@@ -2,12 +2,15 @@ import { Counter, Gauge, register } from 'prom-client';
 
 class CounterAdapter {
   counter: Counter;
-  constructor(name: string, help: string, labels?: string[]) {
+  constructor(label: object, name: string, help: string, labels?: string[]) {
+    this.label = label;
     this.counter = new Counter(name, help, labels);
   }
 
   increment(value: number) {
-    this.counter.inc(value);
+    console.log(this.label);
+    console.log(value);
+    this.counter.inc(this.label, value);
   }
 
   get() {
@@ -17,12 +20,13 @@ class CounterAdapter {
 
 class GaugeAdapter {
   gauge: Gauge;
-  constructor(name: string, help: string, labels?: string[]) {
+  constructor(label: object, name: string, help: string, labels?: string[]) {
+    this.label = label;
     this.gauge = new Gauge(name, help, labels);
   }
 
   increment(value: number) {
-    this.gauge.inc(value);
+    this.gauge.inc(this.label, value);
   }
 
   get() {
@@ -45,7 +49,7 @@ export default class PrometheusMetrics {
     var labelNameList = this.getTagNameList(tags);
     var key = name + ',' + labelNameList.toString();
     if (!(key in this.cache)) {
-      this.cache[key] = new CounterAdapter({
+      this.cache[key] = new CounterAdapter(tags, {
         name: name,
         help: name,
         labelNames: labelNameList,
@@ -58,7 +62,7 @@ export default class PrometheusMetrics {
     var labelNameList = this.getTagNameList(tags);
     var key = name + ',' + labelNameList.toString();
     if (!(key in this.cache)) {
-      this.cache[key] = new GaugeAdapter({
+      this.cache[key] = new GaugeAdapter(tags, {
         name: name,
         help: name,
         labelNames: labelNameList,

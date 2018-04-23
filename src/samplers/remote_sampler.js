@@ -69,7 +69,7 @@ export default class RemoteControlledSampler {
 
     this._onSamplerUpdate = options.onSamplerUpdate;
 
-    if (options.refreshInterval !== 0) {
+    if (this._refreshInterval !== 0) {
       let randomDelay: number = Math.random() * this._refreshInterval;
       this._initialDelayTimeoutHandle = setTimeout(this._afterInitialDelay.bind(this), randomDelay);
     }
