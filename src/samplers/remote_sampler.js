@@ -94,6 +94,7 @@ export default class RemoteControlledSampler {
   _refreshSamplingStrategy() {
     let serviceName: string = encodeURIComponent(this._serviceName);
     const success: Function = body => {
+      this._logger.info('success response');
       this._parseSamplingServerResponse(body);
     };
     const error: Function = err => {
@@ -108,6 +109,7 @@ export default class RemoteControlledSampler {
     let strategy;
     try {
       strategy = JSON.parse(body);
+      this._logger.info(strategy);
       if (!strategy) {
         throw 'Malformed response: ' + body;
       }

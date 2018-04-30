@@ -11,6 +11,7 @@ var config = {
   sampler: {
     type: 'remote',
     param: 1,
+    refreshIntervalMs: 1000,
   },
 };
 

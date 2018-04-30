@@ -84,6 +84,7 @@ export default class Configuration {
         port: port,
         refreshInterval: refreshIntervalMs,
         metrics: options.metrics,
+        logger: options.logger,
       });
     }
 
