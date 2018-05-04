@@ -136,7 +136,7 @@ export default class Tracer {
   }
 
   _report(span: Span): void {
-    this._metrics.spansFinished(1);
+    this._metrics.spansFinished.increment(1);
     this._reporter.report(span);
   }
 

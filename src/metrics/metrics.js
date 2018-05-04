@@ -58,7 +58,7 @@ export default class Metrics {
       sampled: 'n',
     });
 
-    this.spansFinished = this._factory.createCounter2('jaeger:finished_spans');
+    this.spansFinished = this._factory.createCounter('jaeger:finished_spans');
 
     this.spansStartedSampled = this._factory.createCounter('jaeger:started_spans', {
       sampled: 'y',
