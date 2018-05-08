@@ -114,9 +114,8 @@ export default class Configuration {
         senderConfig['port'] = config.reporter.agentPort;
       }
     }
-    if (options.metrics) {
-      reporterConfig['metrics'] = options.metrics;
-    }
+    reporterConfig['metrics'] = options.metrics;
+    reporterConfig['logger'] = options.logger;
     let sender = new UDPSender(senderConfig);
     let remoteReporter = new RemoteReporter(sender, reporterConfig);
     if (reporters.length == 0) {
