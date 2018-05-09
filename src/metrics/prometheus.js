@@ -22,8 +22,8 @@ class CounterAdapter {
   }
 
   increment(value: number) {
-    console.log(this.name);
-    console.log(this.label);
+    //console.log(this.name);
+    //console.log(this.label);
     this.counter.inc(this.label, value);
   }
 
@@ -46,6 +46,22 @@ class GaugeAdapter {
 
   get() {
     return this.gauge.get();
+  }
+}
+
+class MetricsAdapter {
+  constructor(Metric, label: object, name: string, help: string, labels?: string[]) {
+    this.label = label;
+    this.metric = new Metric(name, help, labels);
+  }
+
+  increment(value: number) {
+    //console.log(this.label + value);
+    this.metric.inc(this.label, value);
+  }
+
+  get() {
+    return this.metric.get();
   }
 }
 

@@ -13,6 +13,9 @@ var config = {
     param: 1,
     refreshIntervalMs: 1000,
   },
+  reporter: {
+    logSpans: true,
+  },
 };
 
 var metrics = new PrometheuMetrics();
@@ -34,7 +37,7 @@ app.get('/log', (req, res) => {
   res.end('log');
 
   span.finish();
-  tracer._reporter.flush();
+  //tracer._reporter.flush();
   cnt = cnt + 1;
 });
 
