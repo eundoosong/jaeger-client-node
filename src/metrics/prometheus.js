@@ -89,23 +89,6 @@ export default class PrometheusMetrics {
     return this.cache[key];
   }
 
-  createCounter2(name, tags) {
-    var labelNameList = this.getTagNameList(tags);
-    var key = name + ',' + labelNameList.toString();
-    if (!(key in this.cache)) {
-      this.cache[key] = new Counter(tags, {
-        name: name,
-        help: name,
-        labelNames: labelNameList,
-      });
-    }
-    console.log('createCounter2');
-    var increment = val => {
-      this.cache[key].increment(val);
-    };
-    return increment;
-  }
-
   createGauge(name, tags) {
     var labelNameList = this.getTagNameList(tags);
     var key = name + ',' + labelNameList.toString();
