@@ -51,7 +51,11 @@ app.get('/metrics/counter', (req, res) => {
   res.end(metrics.register().getSingleMetricAsString('jaeger:traces'));
 });
 
-collectDefaultMetrics({ register: metrics.register() });
+var metrics = collectDefaultMetrics({ register: metrics.register() });
+
+for (let item in metrics.metricsList) {
+  console.log(item);
+}
 
 console.log('Server listening to 3000');
 app.listen(3000);

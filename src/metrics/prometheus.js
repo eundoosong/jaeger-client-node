@@ -24,6 +24,7 @@ class CounterAdapter {
   increment(value: number) {
     //console.log(this.name);
     //console.log(this.label);
+    // this.counter.labels()
     this.counter.inc(this.label, value);
   }
 
@@ -68,15 +69,15 @@ class MetricsAdapter {
 export default class PrometheusMetrics {
   cache: any = {};
 
-  getTagNameList(tags) {
+  getTagNameList(tags: any): Array<any> {
     var tagNameList = new Array();
-    for (var key in tags) {
+    for (let key in tags) {
       tagNameList.push(key);
     }
     return tagNameList;
   }
 
-  createCounter(name, tags) {
+  createCounter(name: string, tags: ?any): Counter {
     var labelNameList = this.getTagNameList(tags);
     var key = name + ',' + labelNameList.toString();
     if (!(key in this.cache)) {
@@ -89,7 +90,7 @@ export default class PrometheusMetrics {
     return this.cache[key];
   }
 
-  createGauge(name, tags) {
+  createGauge(name: string, tags: ?any): Gauge {
     var labelNameList = this.getTagNameList(tags);
     var key = name + ',' + labelNameList.toString();
     if (!(key in this.cache)) {
@@ -102,7 +103,7 @@ export default class PrometheusMetrics {
     return this.cache[key];
   }
 
-  register() {
+  register(): register {
     return register;
   }
 }
