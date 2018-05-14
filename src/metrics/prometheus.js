@@ -15,7 +15,7 @@ import { Counter, Gauge, register } from 'prom-client';
 
 class CounterAdapter {
   counter: Counter;
-  constructor(label: object, name: string, help: string, label_keys?: string[]) {
+  constructor(label: object, name: string, help: string, label_keys: string[]) {
     this.label = label;
     this.name = name;
     this.counter = new Counter({
@@ -30,25 +30,32 @@ class CounterAdapter {
     console.log('counter updated');
     console.log(this.name);
     console.log(this.label);
-    // this.counter.labels()
     this.counter.inc(this.label, value);
   }
 }
 
 class GaugeAdapter {
   gauge: Gauge;
-  constructor(label: object, name: string, help: string, labels?: string[]) {
+  constructor(label: object, name: string, help: string, label_keys: string[]) {
     this.label = label;
-    this.gauge = new Gauge(name, help, labels);
+    this.gauge = new Gauge({
+      name: name,
+      help: help,
+      labelNames: label_keys,
+    });
   }
 
   update(value: number): void {
-    this.gauge.inc(this.label, value);
+    this.gauge.set(this.label, value);
   }
 }
 
 export default class PrometheusMetrics {
   cache: any = {};
+
+  constructor(registry) {
+    this._registry = registry;
+  }
 
   getTagNameList(tags: ?any): Array<any> {
     var tagNameList = new Array();
@@ -62,12 +69,9 @@ export default class PrometheusMetrics {
     var labelNameList = this.getTagNameList(tags);
     var key = name + ',' + labelNameList.toString();
     if (!(key in this.cache)) {
-      this.cache[key] = new CounterAdapter(tags, {
-        name: name,
-        help: name,
-        labelNames: labelNameList,
-      });
+      this.cache[key] = new CounterAdapter(tags, name, name, labelNameList);
     }
+    this._registry.registerMetric(this.cache[key].counter);
     return this.cache[key];
   }
 
@@ -75,16 +79,12 @@ export default class PrometheusMetrics {
     var labelNameList = this.getTagNameList(tags);
     var key = name + ',' + labelNameList.toString();
     if (!(key in this.cache)) {
-      this.cache[key] = new GaugeAdapter(tags, {
-        name: name,
-        help: name,
-        labelNames: labelNameList,
-      });
+      this.cache[key] = new GaugeAdapter(tags, name, name, labelNameList);
     }
     return this.cache[key];
   }
 
-  register(): Registry {
+  globalRegistry() {
     return register;
   }
 }

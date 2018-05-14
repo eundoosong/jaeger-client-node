@@ -19,8 +19,7 @@ var config = {
   },
 };
 
-//var metrics = new PrometheuMetrics(registry);
-var metrics = new PrometheuMetrics();
+var metrics = new PrometheuMetrics(registry);
 var options = {
   tags: {
     'my-awesome-service.version': '1.1.2',
@@ -43,21 +42,16 @@ app.get('/log', (req, res) => {
 });
 
 app.get('/metrics', (req, res) => {
-  res.set('Content-Type', metrics.register().contentType);
-  res.end(metrics.register().metrics());
+  res.set('Content-Type', registry.contentType);
+  res.end(registry.metrics());
+  //res.set('Content-Type', metrics.register().contentType);
+  //res.end(metrics.register().metrics());
 });
 
 app.get('/metrics/counter', (req, res) => {
-  res.set('Content-Type', metrics.register().contentType);
-  res.end(metrics.register().getSingleMetricAsString('jaeger:traces'));
+  res.set('Content-Type', metrics.globalRegistry().contentType);
+  res.end(metrics.globalRegistry().getSingleMetricAsString('jaeger:traces'));
 });
-
-//var metrics_list = collectDefaultMetrics({ register: metrics.register() });
-var metrics_list = collectDefaultMetrics();
-
-for (let item in metrics_list.metricsList) {
-  console.log(item);
-}
 
 console.log('Server listening to 3000');
 app.listen(3000);
