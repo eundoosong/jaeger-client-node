@@ -1,8 +1,9 @@
 import { initTracer } from '../src';
 import PrometheuMetrics from '../src/metrics/prometheus';
 import express from 'express';
-import { collectDefaultMetrics } from 'prom-client';
+import { collectDefaultMetrics, Registry } from 'prom-client';
 
+const registry = new Registry();
 const app = express();
 
 // See schema https://github.com/jaegertracing/jaeger-client-node/blob/master/src/configuration.js#L37
@@ -18,6 +19,7 @@ var config = {
   },
 };
 
+//var metrics = new PrometheuMetrics(registry);
 var metrics = new PrometheuMetrics();
 var options = {
   tags: {
@@ -37,7 +39,6 @@ app.get('/log', (req, res) => {
   res.end('log');
 
   span.finish();
-  //tracer._reporter.flush();
   cnt = cnt + 1;
 });
 
@@ -51,7 +52,8 @@ app.get('/metrics/counter', (req, res) => {
   res.end(metrics.register().getSingleMetricAsString('jaeger:traces'));
 });
 
-var metrics_list = collectDefaultMetrics({ register: metrics.register() });
+//var metrics_list = collectDefaultMetrics({ register: metrics.register() });
+var metrics_list = collectDefaultMetrics();
 
 for (let item in metrics_list.metricsList) {
   console.log(item);

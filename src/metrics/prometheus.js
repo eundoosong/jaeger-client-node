@@ -18,10 +18,16 @@ class CounterAdapter {
   constructor(label: object, name: string, help: string, label_keys?: string[]) {
     this.label = label;
     this.name = name;
-    this.counter = new Counter(name, help, label_keys);
+    this.counter = new Counter({
+      name: name,
+      help: help,
+      labelNames: label_keys,
+      registers: [],
+    });
   }
 
   increment(value: number): void {
+    console.log('counter updated');
     console.log(this.name);
     console.log(this.label);
     // this.counter.labels()
@@ -44,7 +50,7 @@ class GaugeAdapter {
 export default class PrometheusMetrics {
   cache: any = {};
 
-  getTagNameList(tags: any): Array<any> {
+  getTagNameList(tags: ?any): Array<any> {
     var tagNameList = new Array();
     for (let key in tags) {
       tagNameList.push(key);
