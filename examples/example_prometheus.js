@@ -11,7 +11,7 @@ var config = {
   sampler: {
     type: 'remote',
     param: 1,
-    refreshIntervalMs: 1000,
+    refreshIntervalMs: 10000,
   },
   reporter: {
     logSpans: true,
@@ -51,9 +51,9 @@ app.get('/metrics/counter', (req, res) => {
   res.end(metrics.register().getSingleMetricAsString('jaeger:traces'));
 });
 
-var metrics = collectDefaultMetrics({ register: metrics.register() });
+var metrics_list = collectDefaultMetrics({ register: metrics.register() });
 
-for (let item in metrics.metricsList) {
+for (let item in metrics_list.metricsList) {
   console.log(item);
 }
 

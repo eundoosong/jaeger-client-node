@@ -15,21 +15,17 @@ import { Counter, Gauge, register } from 'prom-client';
 
 class CounterAdapter {
   counter: Counter;
-  constructor(label: object, name: string, help: string, labels?: string[]) {
+  constructor(label: object, name: string, help: string, label_keys?: string[]) {
     this.label = label;
     this.name = name;
-    this.counter = new Counter(name, help, labels);
+    this.counter = new Counter(name, help, label_keys);
   }
 
-  increment(value: number) {
-    //console.log(this.name);
-    //console.log(this.label);
+  increment(value: number): void {
+    console.log(this.name);
+    console.log(this.label);
     // this.counter.labels()
     this.counter.inc(this.label, value);
-  }
-
-  get() {
-    return this.counter.get();
   }
 }
 
@@ -40,29 +36,8 @@ class GaugeAdapter {
     this.gauge = new Gauge(name, help, labels);
   }
 
-  increment(value: number) {
-    //console.log(this.label + value);
+  update(value: number): void {
     this.gauge.inc(this.label, value);
-  }
-
-  get() {
-    return this.gauge.get();
-  }
-}
-
-class MetricsAdapter {
-  constructor(Metric, label: object, name: string, help: string, labels?: string[]) {
-    this.label = label;
-    this.metric = new Metric(name, help, labels);
-  }
-
-  increment(value: number) {
-    //console.log(this.label + value);
-    this.metric.inc(this.label, value);
-  }
-
-  get() {
-    return this.metric.get();
   }
 }
 
@@ -103,7 +78,7 @@ export default class PrometheusMetrics {
     return this.cache[key];
   }
 
-  register(): register {
+  register(): Registry {
     return register;
   }
 }
