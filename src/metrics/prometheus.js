@@ -11,80 +11,87 @@
 // or implied. See the License for the specific language governing permissions and limitations under
 // the License.
 
-import { Counter, Gauge, register } from 'prom-client';
+import { Counter, Gauge, register as GlobalRegistry } from 'prom-client';
 
 class CounterAdapter {
-  counter: Counter;
-  constructor(label: object, name: string, help: string, label_keys: string[]) {
-    this.label = label;
-    this.name = name;
-    this.counter = new Counter({
-      name: name,
-      help: help,
-      labelNames: label_keys,
-      registers: [],
-    });
+  _counter: Counter;
+
+  constructor(labels: any, config: any) {
+    this._labels = labels;
+    this._counter = new Counter(config);
   }
 
-  increment(value: number): void {
-    console.log('counter updated');
-    console.log(this.name);
-    console.log(this.label);
-    this.counter.inc(this.label, value);
+  increment(delta: number): void {
+    this._counter.inc(this._labels, delta);
   }
 }
 
 class GaugeAdapter {
-  gauge: Gauge;
-  constructor(label: object, name: string, help: string, label_keys: string[]) {
-    this.label = label;
-    this.gauge = new Gauge({
-      name: name,
-      help: help,
-      labelNames: label_keys,
-    });
+  _gauge: Gauge;
+
+  constructor(labels: any, config: any) {
+    this._labels = labels;
+    this._gauge = new Gauge(config);
   }
 
   update(value: number): void {
-    this.gauge.set(this.label, value);
+    this._gauge.set(this._labels, value);
   }
 }
 
-export default class PrometheusMetrics {
-  cache: any = {};
+export default class PrometheusFactory {
+  _cache: any = {};
 
-  constructor(registry) {
+  /**
+   * @param {Object} [registry] - registry used to hold all metrics.
+   */
+  constructor(registry: ?any) {
     this._registry = registry;
   }
 
-  getTagNameList(tags: ?any): Array<any> {
-    var tagNameList = new Array();
+  _getTagNameList(tags: any = {}): Array<any> {
+    let tagNameList = [];
     for (let key in tags) {
       tagNameList.push(key);
     }
     return tagNameList;
   }
 
-  createCounter(name: string, tags: ?any): Counter {
-    var labelNameList = this.getTagNameList(tags);
-    var key = name + ',' + labelNameList.toString();
-    if (!(key in this.cache)) {
-      this.cache[key] = new CounterAdapter(tags, name, name, labelNameList);
+  createCounter(name: string, tags: any = {}): Counter {
+    let labelNameList = this._getTagNameList(tags);
+    let key = name + ',' + labelNameList.toString();
+    if (!(key in this._cache)) {
+      let config = {
+        name: name,
+        help: name,
+        labelNames: labelNameList,
+      };
+      if (this._registry) {
+        config['registers'] = [this._registry];
+      }
+      this._cache[key] = new CounterAdapter(tags, config);
     }
-    this._registry.registerMetric(this.cache[key].counter);
-    return this.cache[key];
+    return this._cache[key];
   }
 
-  createGauge(name: string, tags: ?any): Gauge {
-    var labelNameList = this.getTagNameList(tags);
-    var key = name + ',' + labelNameList.toString();
-    if (!(key in this.cache)) {
-      this.cache[key] = new GaugeAdapter(tags, name, name, labelNameList);
+  createGauge(name: string, tags: any = {}): Gauge {
+    let labelNameList = this._getTagNameList(tags);
+    let key = name + ',' + labelNameList.toString();
+    if (!(key in this._cache)) {
+      let config = {
+        name: name,
+        help: name,
+        labelNames: labelNameList,
+      };
+      if (this._registry) {
+        config['registers'] = [this._registry];
+      }
+      this._cache[key] = new GaugeAdapter(tags, config);
     }
-    return this.cache[key];
+    return this._cache[key];
   }
 
-  globalRegistry() {
-    return register;
+  get registry(): any {
+    return this._registry || GlobalRegistry;
   }
 }

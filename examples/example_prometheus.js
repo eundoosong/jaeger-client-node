@@ -1,12 +1,11 @@
 import { initTracer } from '../src';
-import PrometheuMetrics from '../src/metrics/prometheus';
+import PrometheusFactory from '../src/metrics/prometheus';
 import express from 'express';
-import { collectDefaultMetrics, Registry } from 'prom-client';
+import { Registry } from 'prom-client';
 
 const registry = new Registry();
 const app = express();
 
-// See schema https://github.com/jaegertracing/jaeger-client-node/blob/master/src/configuration.js#L37
 var config = {
   serviceName: 'my-awesome-service',
   sampler: {
@@ -19,7 +18,8 @@ var config = {
   },
 };
 
-var metrics = new PrometheuMetrics(registry);
+registry.setDefaultLabels({ service_name: config.serviceName });
+var metrics = new PrometheusFactory(registry);
 var options = {
   tags: {
     'my-awesome-service.version': '1.1.2',
@@ -42,15 +42,8 @@ app.get('/log', (req, res) => {
 });
 
 app.get('/metrics', (req, res) => {
-  res.set('Content-Type', registry.contentType);
-  res.end(registry.metrics());
-  //res.set('Content-Type', metrics.register().contentType);
-  //res.end(metrics.register().metrics());
-});
-
-app.get('/metrics/counter', (req, res) => {
-  res.set('Content-Type', metrics.globalRegistry().contentType);
-  res.end(metrics.globalRegistry().getSingleMetricAsString('jaeger:traces'));
+  res.set('Content-Type', metrics.registry.contentType);
+  res.end(metrics.registry.metrics());
 });
 
 console.log('Server listening to 3000');
