@@ -1,9 +1,8 @@
 import { initTracer } from '../src';
 import PrometheusFactory from '../src/metrics/prometheus';
 import express from 'express';
-import { Registry } from 'prom-client';
+import { register as registry } from 'prom-client';
 
-const registry = new Registry();
 const app = express();
 
 var config = {
@@ -19,7 +18,7 @@ var config = {
 };
 
 registry.setDefaultLabels({ service_name: config.serviceName });
-var metrics = new PrometheusFactory(registry);
+var metrics = new PrometheusFactory();
 var options = {
   tags: {
     'my-awesome-service.version': '1.1.2',
@@ -42,8 +41,8 @@ app.get('/log', (req, res) => {
 });
 
 app.get('/metrics', (req, res) => {
-  res.set('Content-Type', metrics.registry.contentType);
-  res.end(metrics.registry.metrics());
+  res.set('Content-Type', registry.contentType);
+  res.end(registry.metrics());
 });
 
 console.log('Server listening to 3000');

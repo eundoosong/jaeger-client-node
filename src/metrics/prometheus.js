@@ -11,9 +11,10 @@
 // or implied. See the License for the specific language governing permissions and limitations under
 // the License.
 
-import { Counter, Gauge, register as GlobalRegistry } from 'prom-client';
+import { Counter, Gauge } from 'prom-client';
 
-class CounterAdapter {
+const CounterAdapter = class {
+  _labels: any;
   _counter: Counter;
 
   constructor(labels: any, config: any) {
@@ -26,7 +27,8 @@ class CounterAdapter {
   }
 }
 
-class GaugeAdapter {
+const GaugeAdapter = class {
+  _labels: any;
   _gauge: Gauge;
 
   constructor(labels: any, config: any) {
@@ -42,13 +44,6 @@ class GaugeAdapter {
 export default class PrometheusFactory {
   _cache: any = {};
 
-  /**
-   * @param {Object} [registry] - registry used to hold all metrics.
-   */
-  constructor(registry: ?any) {
-    this._registry = registry;
-  }
-
   _getTagNameList(tags: any = {}): Array<any> {
     let tagNameList = [];
     for (let key in tags) {
@@ -57,41 +52,37 @@ export default class PrometheusFactory {
     return tagNameList;
   }
 
+  _createMetric(metric: any, name: string, tags: any = {}): Counter {
+    let labelNameList = this._getTagNameList(tags);
+    let key = name + ',' + labelNameList.toString();
+    if (!(key in this._cache)) {
+      let config = {
+        name: name,
+        help: name,
+        labelNames: labelNameList,
+      };
+      this._cache[key] = new metric(tags, config);
+    }
+    return this._cache[key];
+  }
+
+  /**
+   * Create counter metric
+   * @param {string} name - metric name
+   * @param {any} tags - labels
+   * @returns {Counter} - created counter metric
+   */
   createCounter(name: string, tags: any = {}): Counter {
-    let labelNameList = this._getTagNameList(tags);
-    let key = name + ',' + labelNameList.toString();
-    if (!(key in this._cache)) {
-      let config = {
-        name: name,
-        help: name,
-        labelNames: labelNameList,
-      };
-      if (this._registry) {
-        config['registers'] = [this._registry];
-      }
-      this._cache[key] = new CounterAdapter(tags, config);
-    }
-    return this._cache[key];
+    return this._createMetric(CounterAdapter, name, tags)
   }
 
+  /**
+   * Create gauge metric
+   * @param {string} name - metric name
+   * @param {any} tags - labels
+   * @returns {Gauge} - created gauge metric
+   */
   createGauge(name: string, tags: any = {}): Gauge {
-    let labelNameList = this._getTagNameList(tags);
-    let key = name + ',' + labelNameList.toString();
-    if (!(key in this._cache)) {
-      let config = {
-        name: name,
-        help: name,
-        labelNames: labelNameList,
-      };
-      if (this._registry) {
-        config['registers'] = [this._registry];
-      }
-      this._cache[key] = new GaugeAdapter(tags, config);
-    }
-    return this._cache[key];
-  }
-
-  get registry(): any {
-    return this._registry || GlobalRegistry;
+    return this._createMetric(GaugeAdapter, name, tags)
   }
 }
