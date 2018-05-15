@@ -10,7 +10,7 @@
 // or implied. See the License for the specific language governing permissions and limitations under
 // the License.
 
-import { assert, expect } from 'chai'
+import { assert, expect } from 'chai';
 import PrometheusFactory from '../../src/metrics/prometheus';
 import { register as registry } from 'prom-client';
 
@@ -19,24 +19,36 @@ describe('prometheus', () => {
 
   beforeEach(() => {
     try {
-      metrics = new PrometheusFactory()
+      metrics = new PrometheusFactory();
     } catch (e) {
-      console.log('beforeEach failed', e)
-      console.log(e.stack)
+      console.log('beforeEach failed', e);
+      console.log(e.stack);
     }
   });
 
-  afterEach(() => {
-
-  });
+  afterEach(() => {});
 
   it('update counter metrics', () => {
     let counter = metrics.createCounter('jaeger:test_counter', {
-      result: 'ok'
-    })
-    counter.increment(1)
-    let result = registry.getSingleMetricAsString('jaeger:test_counter')
-    console.log(result)
-    assert.equal(result, 'test')
+      result: 'ok',
+    });
+    counter.increment(1);
+    let result = registry.getSingleMetric('jaeger:test_counter');
+    let metric = result.get();
+    assert.equal(metric['type'], 'counter');
+    assert.equal(metric['name'], 'jaeger:test_counter');
+    assert.equal(metric.values[0]['value'], 1);
   });
-})
+
+  it('update gauge metrics', () => {
+    let counter = metrics.createGauge('jaeger:test_gauge', {
+      result: 'ok',
+    });
+    counter.update(10);
+    let result = registry.getSingleMetric('jaeger:test_gauge');
+    let metric = result.get();
+    assert.equal(metric['type'], 'gauge');
+    assert.equal(metric['name'], 'jaeger:test_gauge');
+    assert.equal(metric.values[0]['value'], 10);
+  });
+});
