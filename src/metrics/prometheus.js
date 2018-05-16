@@ -14,55 +14,62 @@
 import { Counter, Gauge } from 'prom-client';
 
 let CounterAdapter = class {
-  _labels: any;
   _counter: Counter;
+  _labels: any;
 
-  constructor(labels: any, config: any) {
-    this._labels = labels;
+  constructor(config: any) {
     this._counter = new Counter(config);
   }
 
   increment(delta: number): void {
     this._counter.inc(this._labels, delta);
   }
-}
+
+  labelValues(labels: any): void {
+    this._labels = labels;
+  }
+};
 
 let GaugeAdapter = class {
-  _labels: any;
   _gauge: Gauge;
+  _labels: any;
 
-  constructor(labels: any, config: any) {
-    this._labels = labels;
+  constructor(config: any) {
     this._gauge = new Gauge(config);
   }
 
   update(value: number): void {
     this._gauge.set(this._labels, value);
   }
-}
+
+  labelValues(labels: any): void {
+    this._labels = labels;
+  }
+};
 
 export default class PrometheusFactory {
   _cache: any = {};
 
-  _getTagNameList(tags: any = {}): Array<any> {
-    let tagNameList = [];
+  _getTagKeyList(tags: any = {}): Array<any> {
+    let tagKeyList = [];
     for (let key in tags) {
-      tagNameList.push(key);
+      tagKeyList.push(key);
     }
-    return tagNameList;
+    return tagKeyList;
   }
 
-  _createMetric(metric: any, name: string, tags: any = {}): Counter {
-    let labelNameList = this._getTagNameList(tags);
-    let key = name + ',' + labelNameList.toString();
+  _createMetric(metric: any, name: string, labels: any = {}): Counter {
+    let labelNames = this._getTagKeyList(labels);
+    let key = name + ',' + labelNames.toString();
     if (!(key in this._cache)) {
       let config = {
         name: name,
         help: name,
-        labelNames: labelNameList,
+        labelNames: labelNames,
       };
-      this._cache[key] = new metric(tags, config);
+      this._cache[key] = new metric(config);
     }
+    this._cache[key].labelValues(labels);
     return this._cache[key];
   }
 
@@ -73,7 +80,7 @@ export default class PrometheusFactory {
    * @returns {Counter} - created counter metric
    */
   createCounter(name: string, tags: any = {}): Counter {
-    return this._createMetric(CounterAdapter, name, tags)
+    return this._createMetric(CounterAdapter, name, tags);
   }
 
   /**
@@ -83,6 +90,6 @@ export default class PrometheusFactory {
    * @returns {Gauge} - created gauge metric
    */
   createGauge(name: string, tags: any = {}): Gauge {
-    return this._createMetric(GaugeAdapter, name, tags)
+    return this._createMetric(GaugeAdapter, name, tags);
   }
 }
