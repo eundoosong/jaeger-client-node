@@ -1,12 +1,12 @@
 import { initTracer } from '../src';
 import PrometheusFactory from '../src/metrics/prometheus';
 import express from 'express';
-import { register as registry } from 'prom-client';
+import { register as globalRegistry } from 'prom-client';
 
 const app = express();
 
 var config = {
-  serviceName: 'my-awesome-service',
+  serviceName: 'prometheus_test',
   sampler: {
     type: 'remote',
     param: 1,
@@ -17,11 +17,11 @@ var config = {
   },
 };
 
-registry.setDefaultLabels({ service_name: config.serviceName });
-var metrics = new PrometheusFactory();
+globalRegistry.setDefaultLabels({ service_name: config.serviceName });
+var metrics: MectricsFactory = new PrometheusFactory();
 var options = {
   tags: {
-    'my-awesome-service.version': '1.1.2',
+    'version': '0.0.1',
   },
   metrics: metrics,
   logger: console,
@@ -41,8 +41,8 @@ app.get('/log', (req, res) => {
 });
 
 app.get('/metrics', (req, res) => {
-  res.set('Content-Type', registry.contentType);
-  res.end(registry.metrics());
+  res.set('Content-Type', globalRegistry.contentType);
+  res.end(globalRegistry.metrics());
 });
 
 console.log('Server listening to 3000');

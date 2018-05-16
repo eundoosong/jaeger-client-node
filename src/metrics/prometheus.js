@@ -13,7 +13,7 @@
 
 import { Counter, Gauge } from 'prom-client';
 
-const CounterAdapter = class {
+let CounterAdapter = class {
   _labels: any;
   _counter: Counter;
 
@@ -27,7 +27,7 @@ const CounterAdapter = class {
   }
 }
 
-const GaugeAdapter = class {
+let GaugeAdapter = class {
   _labels: any;
   _gauge: Gauge;
 
@@ -67,7 +67,7 @@ export default class PrometheusFactory {
   }
 
   /**
-   * Create counter metric
+   * Create a counter metric
    * @param {string} name - metric name
    * @param {any} tags - labels
    * @returns {Counter} - created counter metric
@@ -77,7 +77,7 @@ export default class PrometheusFactory {
   }
 
   /**
-   * Create gauge metric
+   * Create a gauge metric
    * @param {string} name - metric name
    * @param {any} tags - labels
    * @returns {Gauge} - created gauge metric

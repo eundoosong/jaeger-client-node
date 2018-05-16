@@ -10,11 +10,11 @@
 // or implied. See the License for the specific language governing permissions and limitations under
 // the License.
 
-import { assert, expect } from 'chai';
+import { assert } from 'chai';
 import PrometheusFactory from '../../src/metrics/prometheus';
-import { register as registry } from 'prom-client';
+import { register as globalRegistry } from 'prom-client';
 
-describe('prometheus', () => {
+describe('Prometheus metrics', () => {
   let metrics;
 
   beforeEach(() => {
@@ -26,29 +26,61 @@ describe('prometheus', () => {
     }
   });
 
-  afterEach(() => {});
-
-  it('update counter metrics', () => {
-    let counter = metrics.createCounter('jaeger:test_counter', {
-      result: 'ok',
-    });
-    counter.increment(1);
-    let result = registry.getSingleMetric('jaeger:test_counter');
-    let metric = result.get();
-    assert.equal(metric['type'], 'counter');
-    assert.equal(metric['name'], 'jaeger:test_counter');
-    assert.equal(metric.values[0]['value'], 1);
+  afterEach(() => {
+    globalRegistry.clear()
   });
 
-  it('update gauge metrics', () => {
-    let counter = metrics.createGauge('jaeger:test_gauge', {
-      result: 'ok',
-    });
+  it('should increment a counter with a provided value', () => {
+    let name = 'jaeger:test_counter';
+
+    let counter = metrics.createCounter(name);
+    counter.increment(1);
+
+    let metric = globalRegistry.getSingleMetric(name).get();
+    assert.equal(metric['type'], 'counter');
+    assert.equal(metric['name'], name);
+    assert.equal(metric.values[0].value, 1);
+  });
+
+  it('should increment a tagged counter with a provided value', () => {
+    let name = 'jaeger:test_counter';
+    let tags = { result: 'ok' }
+
+    let counter = metrics.createCounter(name, tags);
+    counter.increment(1);
+    counter.increment(1);
+
+    let metric = globalRegistry.getSingleMetric(name).get();
+    assert.equal(metric['type'], 'counter');
+    assert.equal(metric['name'], name);
+    assert.equal(metric.values[0].labels, tags);
+    assert.equal(metric.values[0].value, 2);
+  });
+
+  it('should update a gauge to a provided value', () => {
+    let name = 'jaeger:test_gauge';
+
+    let counter = metrics.createGauge(name);
     counter.update(10);
-    let result = registry.getSingleMetric('jaeger:test_gauge');
-    let metric = result.get();
+
+    let metric = globalRegistry.getSingleMetric(name).get();
     assert.equal(metric['type'], 'gauge');
-    assert.equal(metric['name'], 'jaeger:test_gauge');
-    assert.equal(metric.values[0]['value'], 10);
+    assert.equal(metric['name'], name);
+    assert.equal(metric.values[0].value, 10);
+  });
+
+  it('should update a tagged gauge to a provided value', () => {
+    let name = 'jaeger:test_gauge';
+    let tags = { result: 'ok' };
+
+    let counter = metrics.createGauge(name, tags);
+    counter.update(10);
+    counter.update(20);
+
+    let metric = globalRegistry.getSingleMetric(name).get();
+    assert.equal(metric['type'], 'gauge');
+    assert.equal(metric['name'], name);
+    assert.equal(metric.values[0].labels, tags);
+    assert.equal(metric.values[0].value, 20);
   });
 });
