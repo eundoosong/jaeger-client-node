@@ -68,7 +68,7 @@
     "lint": "eslint $(ls src/ | grep '.js$') && echo '# linter passed' && npm run check-license",
     "precommit": "lint-staged",
     "test": "make test",
-    "test-all": "npm run test-core && npm run test-samplers && npm run test-crossdock && npm run test-baggage && npm run test-throttler",
+    "test-all": "npm run test-core && npm run test-samplers && npm run test-crossdock && npm run test-baggage && npm run test-throttler && npm run test-metrics",
     "test-core": "mocha --compilers js:babel-core/register test",
     "test-dist": "mocha dist/test/ dist/test/baggage/ dist/test/throttler dist/test/samplers/",
     "test-samplers": "mocha --compilers js:babel-core/register test/samplers",
