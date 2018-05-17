@@ -17,8 +17,8 @@ var config = {
   },
 };
 
-globalRegistry.setDefaultLabels({ service_name: config.serviceName });
-var metrics: MectricsFactory = new PrometheusFactory();
+//globalRegistry.setDefaultLabels({ service_name: config.serviceName });
+var metrics: MectricsFactory = new PrometheusFactory(config.serviceName);
 var options = {
   tags: {
     'version': '0.0.1',

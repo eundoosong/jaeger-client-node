@@ -18,8 +18,8 @@ let CounterPromWrapper = class {
   _labels: any;
 
   constructor(counter: Counter, labels: any) {
-    this._counter = counter
-    this._labels = labels
+    this._counter = counter;
+    this._labels = labels;
   }
 
   increment(delta: number): void {
@@ -32,8 +32,8 @@ let GaugePromWrapper = class {
   _labels: any;
 
   constructor(gauge: Gauge, labels: any) {
-    this._gauge = gauge
-    this._labels = labels
+    this._gauge = gauge;
+    this._labels = labels;
   }
 
   update(value: number): void {
@@ -43,6 +43,11 @@ let GaugePromWrapper = class {
 
 export default class PrometheusFactory {
   _cache: any = {};
+  _namespace: ?string;
+
+  constructor(namespace: ?string) {
+    this._namespace = namespace;
+  }
 
   _getLabelsKeyList(tags: any = {}): Array<string> {
     let tagKeyList = [];
@@ -55,10 +60,13 @@ export default class PrometheusFactory {
   _createMetric(metric: any, name: string, labels: any): any {
     let labelNames = this._getLabelsKeyList(labels);
     let key = name + ',' + labelNames.toString();
+    let help = name;
+    if(this._namespace != null)
+      name = this._namespace + '_' + name;
     if (!(key in this._cache)) {
       let config = {
         name: name,
-        help: name,
+        help: help,
         labelNames: labelNames,
       };
       this._cache[key] = new metric(config);

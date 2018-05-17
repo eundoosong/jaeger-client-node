@@ -16,10 +16,11 @@ import { register as globalRegistry } from 'prom-client';
 
 describe('Prometheus metrics', () => {
   let metrics;
+  let namespace = 'test';
 
   beforeEach(() => {
     try {
-      metrics = new PrometheusFactory();
+      metrics = new PrometheusFactory(namespace);
     } catch (e) {
       console.log('beforeEach failed', e);
       console.log(e.stack);
@@ -31,10 +32,11 @@ describe('Prometheus metrics', () => {
   });
 
   it('should increment a counter with a provided value', () => {
-    let name = 'jaeger:test_counter';
+    let name = 'jaeger:counter';
 
     metrics.createCounter(name).increment(1);
 
+    name = namespace + '_' + name
     let metric = globalRegistry.getSingleMetric(name).get();
     assert.equal(metric['type'], 'counter');
     assert.equal(metric['name'], name);
@@ -42,7 +44,7 @@ describe('Prometheus metrics', () => {
   });
 
   it('should increment a tagged counter with a provided value', () => {
-    let name = 'jaeger:test_counter';
+    let name = 'jaeger:counter';
 
     let tags1 = { result: 'ok' };
     let counter1 = metrics.createCounter(name, tags1);
@@ -54,6 +56,7 @@ describe('Prometheus metrics', () => {
     counter2.increment(); // increment by 1
 
     assert.equal(globalRegistry.getMetricsAsArray().length, 1);
+    name = namespace + '_' + name
     let metric = globalRegistry.getSingleMetric(name).get();
     assert.equal(metric['type'], 'counter');
     assert.equal(metric['name'], name);
@@ -65,10 +68,11 @@ describe('Prometheus metrics', () => {
   });
 
   it('should update a gauge to a provided value', () => {
-    let name = 'jaeger:test_gauge';
+    let name = 'jaeger:gauge';
 
     metrics.createGauge(name).update(10);
 
+    name = namespace + '_' + name
     let metric = globalRegistry.getSingleMetric(name).get();
     assert.equal(metric['type'], 'gauge');
     assert.equal(metric['name'], name);
@@ -76,7 +80,7 @@ describe('Prometheus metrics', () => {
   });
 
   it('should update a tagged gauge to a provided value', () => {
-    let name = 'jaeger:test_gauge';
+    let name = 'jaeger:gauge';
 
     let tags1 = { result: 'ok' };
     let gauge1 = metrics.createGauge(name, tags1);
@@ -87,6 +91,7 @@ describe('Prometheus metrics', () => {
     gauge2.update(10);
 
     assert.equal(globalRegistry.getMetricsAsArray().length, 1);
+    name = namespace + '_' + name
     let metric = globalRegistry.getSingleMetric(name).get();
     assert.equal(metric['type'], 'gauge');
     assert.equal(metric['name'], name);
@@ -98,10 +103,10 @@ describe('Prometheus metrics', () => {
   });
 
   it('should update metrics to a provided value', () => {
-    metrics.createCounter('jaeger:test_counter', { result: 'ok' }).increment(1);
-    metrics.createCounter('jaeger:test_counter', { result: 'err' }).increment(1);
-    metrics.createGauge('jaeger:test_gauge', { result: 'ok' }).update(10);
-    metrics.createGauge('jaeger:test_gauge', { result: 'err' }).update(10);
+    metrics.createCounter('jaeger:counter', { result: 'ok' }).increment(1);
+    metrics.createCounter('jaeger:counter', { result: 'err' }).increment(1);
+    metrics.createGauge('jaeger:gauge', { result: 'ok' }).update(1);
+    metrics.createGauge('jaeger:gauge', { result: 'err' }).update(1);
     assert.equal(globalRegistry.getMetricsAsArray().length, 2);
   });
 });
