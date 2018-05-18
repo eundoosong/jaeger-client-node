@@ -1,5 +1,5 @@
 import { initTracer } from '../src';
-import PrometheusFactory from '../src/metrics/prometheus';
+import PrometheusMetricsFactory from '../src/metrics/prometheus';
 import express from 'express';
 import { register as globalRegistry } from 'prom-client';
 
@@ -18,7 +18,7 @@ var config = {
 };
 
 //globalRegistry.setDefaultLabels({ service_name: config.serviceName });
-var metrics: MectricsFactory = new PrometheusFactory(config.serviceName);
+var metrics = new PrometheusMetricsFactory(config.serviceName);
 var options = {
   tags: {
     'version': '0.0.1',
