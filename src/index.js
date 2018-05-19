@@ -33,11 +33,11 @@ import ZipkinB3TextMapCodec from './propagators/zipkin_b3_text_map_codec';
 import TestUtils from './test_util';
 import TChannelBridge from './tchannel_bridge';
 
-import PrometheusMetricsFactory from './metrics/prometheus';
-
 import * as opentracing from 'opentracing';
 
-module.exports = {
+import Utils from './util.js';
+
+var modules = {
   Configuration,
   initTracer: Configuration.initTracer,
   SpanContext,
@@ -60,6 +60,16 @@ module.exports = {
 
   TestUtils,
   TChannelBridge,
-  PrometheusMetricsFactory,
   opentracing,
 };
+
+// http://2ality.com/2017/01/import-operator.html
+// http://babeljs.io/docs/plugins/syntax-dynamic-import/
+// https://github.com/airbnb/babel-plugin-dynamic-import-webpack
+// https://github.com/airbnb/babel-plugin-dynamic-import-node
+if (!Utils.startsWith(process.version, 'v0.10.') && !Utils.startsWith(process.version, 'v0.12.')) {
+  import('./metrics/prometheus').then(PrometheusMetricsFactory => {
+    modules = { PrometheusMetricsFactory };
+  });
+}
+module.exports = modules;
