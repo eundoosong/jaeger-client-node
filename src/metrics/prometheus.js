@@ -49,7 +49,7 @@ export default class PrometheusMetricsFactory {
     this._namespace = namespace;
   }
 
-  _getLabelsKeyList(tags: any = {}): Array<string> {
+  _getLabelsKeyList(tags: any): Array<string> {
     let tagKeyList = [];
     for (let key in tags) {
       tagKeyList.push(key);
@@ -65,12 +65,7 @@ export default class PrometheusMetricsFactory {
       name = this._namespace + '_' + name;
     }
     if (!(key in this._cache)) {
-      let config = {
-        name: name,
-        help: help,
-        labelNames: labelNames,
-      };
-      this._cache[key] = new metric(config);
+      this._cache[key] = new metric(name, help, labelNames);
     }
     return this._cache[key];
   }

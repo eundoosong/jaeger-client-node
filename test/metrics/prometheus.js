@@ -14,6 +14,34 @@ import { assert } from 'chai';
 import PrometheusMetricsFactory from '../../src/metrics/prometheus';
 import { register as globalRegistry } from 'prom-client';
 
+describe('Prometheus metrics without namespace', () => {
+  let metrics;
+
+  beforeEach(() => {
+    try {
+      metrics = new PrometheusMetricsFactory();
+    } catch (e) {
+      console.log('beforeEach failed', e);
+      console.log(e.stack);
+    }
+  });
+
+  afterEach(() => {
+    globalRegistry.clear();
+  });
+
+  it('should increment a counter with a provided value', () => {
+    let name = 'jaeger:counter';
+
+    metrics.createCounter(name).increment(1);
+
+    let metric = globalRegistry.getSingleMetric(name).get();
+    assert.equal(metric.type, 'counter');
+    assert.equal(metric.name, name);
+    assert.equal(metric.values[0].value, 1);
+  });
+});
+
 describe('Prometheus metrics', () => {
   let metrics;
   let namespace = 'test';
@@ -55,7 +83,7 @@ describe('Prometheus metrics', () => {
     let counter2 = metrics.createCounter(name, tags2);
     counter2.increment(); // increment by 1
 
-    assert.equal(globalRegistry.getMetricsAsArray().length, 1);
+    assert.equal(globalRegistry.getMetricsAsJSON().length, 1);
     name = namespace + '_' + name;
     let metric = globalRegistry.getSingleMetric(name).get();
     assert.equal(metric.values.length, 2);
@@ -88,7 +116,7 @@ describe('Prometheus metrics', () => {
     let gauge2 = metrics.createGauge(name, tags2);
     gauge2.update(10);
 
-    assert.equal(globalRegistry.getMetricsAsArray().length, 1);
+    assert.equal(globalRegistry.getMetricsAsJSON().length, 1);
     name = namespace + '_' + name;
     let metric = globalRegistry.getSingleMetric(name).get();
     assert.equal(metric.values.length, 2);
@@ -103,6 +131,6 @@ describe('Prometheus metrics', () => {
     metrics.createCounter('jaeger:counter', { result: 'err' }).increment(1);
     metrics.createGauge('jaeger:gauge', { result: 'ok' }).update(1);
     metrics.createGauge('jaeger:gauge', { result: 'err' }).update(1);
-    assert.equal(globalRegistry.getMetricsAsArray().length, 2);
+    assert.equal(globalRegistry.getMetricsAsJSON().length, 2);
   });
 });
