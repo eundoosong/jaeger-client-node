@@ -33,8 +33,6 @@ import ZipkinB3TextMapCodec from './propagators/zipkin_b3_text_map_codec';
 import TestUtils from './test_util';
 import TChannelBridge from './tchannel_bridge';
 
-import PrometheusMetricsFactory from './metrics/prometheus';
-
 import * as opentracing from 'opentracing';
 
 module.exports = {
@@ -60,6 +58,5 @@ module.exports = {
 
   TestUtils,
   TChannelBridge,
-  PrometheusMetricsFactory,
   opentracing,
 };
