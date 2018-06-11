@@ -45,7 +45,7 @@ export default class PrometheusMetricsFactory {
     this._namespace = namespace;
   }
 
-  _createMetric(metric: any, name: string, labels: any): any {
+  _createMetric(metric: any, name: string, labels: {}): any {
     let labelNames = [];
     let labelValues = [];
     for (let key in labels) {
@@ -69,7 +69,7 @@ export default class PrometheusMetricsFactory {
    * @param {any} tags - labels
    * @returns {Counter} - created counter metric
    */
-  createCounter(name: string, tags: any): Counter {
+  createCounter(name: string, tags: {}): Counter {
     return new CounterPromWrapper(this._createMetric(PromCounter, name, tags));
   }
 
@@ -79,7 +79,7 @@ export default class PrometheusMetricsFactory {
    * @param {any} tags - labels
    * @returns {Gauge} - created gauge metric
    */
-  createGauge(name: string, tags: any): Gauge {
+  createGauge(name: string, tags: {}): Gauge {
     return new GaugePromWrapper(this._createMetric(PromGauge, name, tags));
   }
 }
