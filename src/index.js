@@ -63,13 +63,12 @@ var modules = {
   opentracing,
 };
 
-// http://2ality.com/2017/01/import-operator.html
-// http://babeljs.io/docs/plugins/syntax-dynamic-import/
-// https://github.com/airbnb/babel-plugin-dynamic-import-webpack
-// https://github.com/airbnb/babel-plugin-dynamic-import-node
-if (!Utils.startsWith(process.version, 'v0.10.') && !Utils.startsWith(process.version, 'v0.12.')) {
-  import('./metrics/prometheus').then(PrometheusMetricsFactory => {
-    modules = { PrometheusMetricsFactory };
-  });
+// PrometheusMetricsFactory is only exported when prom-client is installed and node versions is 6.
+if (Utils.startsWith(process.version, 'v6.')) {
+  try {
+    require.resolve('prom-client');
+    modules['PrometheusMetricsFactory'] = require('./metrics/prometheus').default;
+  } catch (e) {}
 }
+
 module.exports = modules;

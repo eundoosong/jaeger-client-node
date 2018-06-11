@@ -160,4 +160,13 @@ export default class Utils {
         error(err);
       });
   }
+
+  static isModuleInstalled(module: string): boolean {
+    try {
+      require.resolve(module);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }
