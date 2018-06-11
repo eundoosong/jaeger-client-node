@@ -63,11 +63,11 @@ var modules = {
   opentracing,
 };
 
-// PrometheusMetricsFactory is only exported when prom-client is installed and node versions is 6.
-if (Utils.startsWith(process.version, 'v6.')) {
+// PrometheusMetricsFactory is only exported when prom-client is installed and node versions is not v0.xxx.
+if (!Utils.startsWith(process.version, 'v0.')) {
   try {
     require.resolve('prom-client');
-    modules['PrometheusMetricsFactory'] = require('./metrics/prometheus').default;
+    modules.PrometheusMetricsFactory = require('./metrics/prometheus').default;
   } catch (e) {}
 }
 
