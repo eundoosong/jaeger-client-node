@@ -11,12 +11,10 @@
 // or implied. See the License for the specific language governing permissions and limitations under
 // the License.
 
-import { Counter as PromCounter, Gauge as PromGauge } from 'prom-client';
-
 class CounterPromWrapper {
-  _counter: PromCounter;
+  _counter: any;
 
-  constructor(counter: PromCounter) {
+  constructor(counter: any) {
     this._counter = counter;
   }
 
@@ -26,9 +24,9 @@ class CounterPromWrapper {
 };
 
 class GaugePromWrapper {
-  _gauge: PromGauge;
+  _gauge: any;
 
-  constructor(gauge: PromGauge) {
+  constructor(gauge: any) {
     this._gauge = gauge;
   }
 
@@ -40,8 +38,12 @@ class GaugePromWrapper {
 export default class PrometheusMetricsFactory {
   _cache: any = {};
   _namespace: ?string;
+  _prom_counter: {};
+  _prom_gauge: {};
 
-  constructor(namespace: ?string) {
+  constructor(prom_counter: {}, prom_gauge: {}, namespace: ?string) {
+    this._prom_counter = prom_counter;
+    this._prom_gauge = prom_gauge;
     this._namespace = namespace;
   }
 
@@ -54,7 +56,7 @@ export default class PrometheusMetricsFactory {
     }
     let key = name + ',' + labelNames.toString();
     let help = name;
-    if (this._namespace != null) {
+    if (this._namespace) {
       name = this._namespace + '_' + name;
     }
     if (!(key in this._cache)) {
@@ -70,7 +72,7 @@ export default class PrometheusMetricsFactory {
    * @returns {Counter} - created counter metric
    */
   createCounter(name: string, tags: {}): Counter {
-    return new CounterPromWrapper(this._createMetric(PromCounter, name, tags));
+    return new CounterPromWrapper(this._createMetric(this._prom_counter, name, tags));
   }
 
   /**
@@ -80,6 +82,6 @@ export default class PrometheusMetricsFactory {
    * @returns {Gauge} - created gauge metric
    */
   createGauge(name: string, tags: {}): Gauge {
-    return new GaugePromWrapper(this._createMetric(PromGauge, name, tags));
+    return new GaugePromWrapper(this._createMetric(this._prom_gauge, name, tags));
   }
 }

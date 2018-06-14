@@ -12,14 +12,14 @@
 
 import { assert } from 'chai';
 import PrometheusMetricsFactory from '../../src/metrics/prometheus';
-import { register as globalRegistry } from 'prom-client';
+import { register as globalRegistry, Counter as PromCounter, Gauge as PromGauge } from 'prom-client';
 
 describe('Prometheus metrics without namespace', () => {
   let metrics;
 
   beforeEach(() => {
     try {
-      metrics = new PrometheusMetricsFactory();
+      metrics = new PrometheusMetricsFactory(PromCounter, PromGauge);
     } catch (e) {
       console.log('beforeEach failed', e);
       console.log(e.stack);
@@ -48,7 +48,7 @@ describe('Prometheus metrics', () => {
 
   beforeEach(() => {
     try {
-      metrics = new PrometheusMetricsFactory(namespace);
+      metrics = new PrometheusMetricsFactory(PromCounter, PromGauge, namespace);
     } catch (e) {
       console.log('beforeEach failed', e);
       console.log(e.stack);
