@@ -65,6 +65,7 @@
     "cover": "babel-node ./node_modules/.bin/babel-istanbul cover ./node_modules/.bin/_mocha -- test/ test/samplers/ test/baggage/ test/throttler/",
     "cover-prom": "babel-node ./node_modules/.bin/babel-istanbul cover ./node_modules/.bin/_mocha -- test/metrics/",
     "coveralls": "npm run cover && cat ./coverage/lcov.info | coveralls",
+    "coveralls-prom": "npm run cover-prom && cat ./coverage/lcov.info | coveralls",
     "codecov": "npm run cover && cat ./coverage/lcov.info | codecov",
     "codecov-prom": "npm run cover-prom && cat ./coverage/lcov.info | codecov",
     "flow": "flow",
