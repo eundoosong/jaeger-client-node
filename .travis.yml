@@ -14,17 +14,19 @@ services:
 
 matrix:
   include:
-  - env: TEST_NODE_VERSION=0.10 COVER=1
+  #- env: TEST_NODE_VERSION=0.10 COVER=1
+  #  sudo: required
+  #  services:
+  #  - docker
+  #- env: TEST_NODE_VERSION=0.10 CROSSDOCK=1
+  #  sudo: required
+  #  services:
+  #    - docker
+  #- env: TEST_NODE_VERSION=6 LINT=1 PROM_METRICS_TEST=1
+  #- env: TEST_NODE_VERSION=4
+  #- env: TEST_NODE_VERSION=node PROM_METRICS_TEST=1
+  - env: TEST_NODE_VERSION=node COVER=1
     sudo: required
-    services:
-    - docker
-  - env: TEST_NODE_VERSION=0.10 CROSSDOCK=1
-    sudo: required
-    services:
-      - docker
-  - env: TEST_NODE_VERSION=6 LINT=1 PROM_METRICS_TEST=1
-  - env: TEST_NODE_VERSION=4
-  - env: TEST_NODE_VERSION=node PROM_METRICS_TEST=1
 
 env:
   global:
@@ -59,7 +61,7 @@ script:
 - if [ "$LINT" = "1" ]; then npm run lint; fi
 - if [ "$CROSSDOCK" != "1" ]; then make test-without-build; fi
 - if [ "$PROM_METRICS_TEST" = "1" ]; then npm run test-prom-metrics; fi
-- if [ "$COVER" = "1" ]; then npm run coveralls; fi
+- if [ "$COVER" = "1" ]; then npm run codecov; fi
 - if [ "$CROSSDOCK" = "1" ]; then make crossdock-fresh ; fi
 
 after_script:

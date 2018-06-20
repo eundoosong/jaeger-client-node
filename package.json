@@ -13,7 +13,10 @@
     "type": "git",
     "url": "git://github.com/jaegertracing/jaeger-client-node.git"
   },
-  "contributors": ["Yuri Shkuro <ys@uber.com>", "Won Jun Jang <wjang@uber.com>"],
+  "contributors": [
+    "Yuri Shkuro <ys@uber.com>",
+    "Won Jun Jang <wjang@uber.com>"
+  ],
   "dependencies": {
     "node-int64": "^0.4.0",
     "thriftrw": "^3.5.0",
@@ -32,6 +35,7 @@
     "body-parser": "^1.15.2",
     "chai": "^3.5.0",
     "coveralls": "^2.11.14",
+    "codecov": "^3.0.2,",
     "eslint": "^3.14.1",
     "eslint-config-airbnb": "^15.1.0",
     "eslint-config-prettier": "^2.9.0",
@@ -42,8 +46,6 @@
     "express": "^4.14.0",
     "flow-bin": "^0.30.0",
     "gulp-sourcemaps": "1.7.x",
-    "husky": "^0.14.3",
-    "lint-staged": "^6.0.0",
     "lodash": "^4.15.0",
     "minimist": "1.2.0",
     "mocha": "^3.0.1",
@@ -62,6 +64,7 @@
     "check-ls": "npm ls --loglevel=http --parseable 1>/dev/null && echo '# npm is in a good state'",
     "cover": "babel-node ./node_modules/.bin/babel-istanbul cover ./node_modules/.bin/_mocha -- test/ test/samplers/ test/baggage/ test/throttler/",
     "coveralls": "npm run cover && cat ./coverage/lcov.info | coveralls",
+    "codecov": "npm run cover && cat ./coverage/lcov.info | codecov",
     "flow": "flow",
     "format": "prettier --write '**/*.{js,json,md}' '!src/jaeger-idl/**'",
     "lint": "eslint $(ls src/ | grep '.js$') && echo '# linter passed' && npm run check-license",
@@ -78,6 +81,9 @@
     "show-cover": "open coverage/lcov-report/index.html"
   },
   "lint-staged": {
-    "*.{js,json,md}": ["prettier --write", "git add"]
+    "*.{js,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
