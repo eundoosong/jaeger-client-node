@@ -12,7 +12,7 @@
 
 import { assert, expect } from 'chai';
 import { PrometheusMetricsFactory } from '../../src/index.js';
-if(process.env.PROM_METRICS_TEST == "1") {
+if(process.env.PROM_METRICS_TEST == '1') {
   var PromClient = require('prom-client');
 }
 
@@ -20,7 +20,7 @@ describe('Prometheus metrics', () => {
   let metrics;
 
   before(function () {
-    if(process.env.PROM_METRICS_TEST != "1") {
+    if(process.env.PROM_METRICS_TEST != '1') {
       this.skip();
     }
   });
@@ -42,7 +42,7 @@ describe('Prometheus metrics', () => {
     expect(() => {
       let fakePromClient = {};
       metrics = new PrometheusMetricsFactory(fakePromClient);
-    }).to.throw("prom-client must be provided");
+    }).to.throw('prom-client must be provided');
   });
 });
 
@@ -51,7 +51,7 @@ describe('Prometheus metrics with namespace', () => {
   let namespace = 'test';
 
   before(function () {
-    if(process.env.PROM_METRICS_TEST != "1") {
+    if(process.env.PROM_METRICS_TEST != '1') {
       this.skip();
     }
   });
